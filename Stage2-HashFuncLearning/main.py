@@ -19,7 +19,7 @@ flags.DEFINE_integer("input_width", None, "The size of image to use (will be cen
 flags.DEFINE_integer("output_height", 32, "The size of the output images to produce [64]")
 flags.DEFINE_integer("output_width", None, "The size of the output images to produce. If None, same value as output_height [None]")
 flags.DEFINE_string("dataset_name", "cifar10", "The name of dataset [cifar10]")
-flags.DEFINE_string("checkpoint_dir", "checkpoint", "Directory name to save the checkpoints [checkpoint]")
+flags.DEFINE_string("checkpoint_dir", "../checkpoint", "Directory name to save the checkpoints [checkpoint]")
 flags.DEFINE_boolean("train", False, "True for training, False for testing [False]")
 flags.DEFINE_boolean("crop", False, "True for training, False for testing [False]")
 flags.DEFINE_boolean("visualize", False, "True for visualizing, False for nothing [False]")
@@ -57,10 +57,9 @@ def main(_):
     if FLAGS.train:
       train.train(model,FLAGS)
     else:
-      if not model.load(FLAGS.checkpoint_dir)[0]:
-        raise Exception("[!] Train a model first, then run test mode")
+       if not model.load(train,FLAGS.checkpoint_dir)[0]:
+         raise Exception("[!] Train a model first, then run test mode")
 
-    OPTION = 1
 
 if __name__ == '__main__':
   tf.app.run()

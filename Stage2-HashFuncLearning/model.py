@@ -15,7 +15,7 @@ class Model(object):
                output_width=3,batch_size=64,f1_dim=32,f2_dim=32,
                 f3_dim=64,f4_dim=64,f5_dim=128,f6_dim=128, fc_dim=4096,
                hashbit=48,slicenum=16,outbit=3,size=32,c_dim=3,
-               dataset_name='default',checkpoint_dir="checkpoint",crop=True):
+               dataset_name='default',checkpoint_dir="../checkpoint",crop=True):
     """
     Args:
       sess: TensorFlow session
@@ -77,9 +77,16 @@ class Model(object):
           loss=tf.sqrt(tf.reduce_sum(tf.square(diff),1))
           return loss
 
-      self.loss=tf.reduce_mean(sqrt_l2_loss_2(self.logits,hashtags))
+      with tf.variable_scope('Loss'):
+          self.loss=tf.reduce_mean(sqrt_l2_loss_2(self.logits,hashtags))
 
       self.loss_sum = scalar_summary("loss", self.loss)
+
+      with tf.variable_scope('Accuracy'):
+          abslogits=tf.abs(self.logits)
+          predictions = tf.cast(tf.greater(abslogits, 0.5, name="predictions"),tf.float32)
+          correct_predictions = tf.equal(predictions, hashtags, name="correct_predictions")
+          self.accuracy = tf.reduce_mean(tf.cast(correct_predictions, tf.float32))
 
       self.t_vars = tf.trainable_variables()
       # self.n_vars = [var for var in t_vars if 'n_' in var.name]
@@ -119,13 +126,13 @@ class Model(object):
       import re
       print(" [*] Reading checkpoints...")
       checkpoint_dir = os.path.join(checkpoint_dir, self.model_dir)
-
       ckpt = tf.train.get_checkpoint_state(checkpoint_dir)
       if ckpt and ckpt.model_checkpoint_path:
           ckpt_name = os.path.basename(ckpt.model_checkpoint_path)
           self.saver.restore(train.sess, os.path.join(checkpoint_dir, ckpt_name))
           counter = int(next(re.finditer("(\d+)(?!.*\d)", ckpt_name)).group(0))
           print(" [*] Success to read {}".format(ckpt_name))
+          #print (train.sess.run(self.logits))
           return True, counter
       else:
           print(" [*] Failed to find a checkpoint")
