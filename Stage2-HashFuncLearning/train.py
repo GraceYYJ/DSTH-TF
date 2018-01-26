@@ -9,15 +9,15 @@ from six.moves import xrange
 
 from ops import *
 from utils import *
-from model import *
+from model2 import *
 
 class Train(object):
     def __init__(self,sess):
         self.sess=sess
 
     def train(self,model,config):
-        #n_optim=tf.train.GradientDescentOptimizer(config.learning_rate).minimize(model.loss, var_list=model.t_vars)
-        n_optim = tf.train.AdamOptimizer(config.learning_rate, beta1=config.beta1).minimize(model.loss, var_list=model.t_vars)
+        n_optim=tf.train.GradientDescentOptimizer(config.learning_rate).minimize(model.loss, var_list=model.t_vars)
+        #n_optim = tf.train.AdamOptimizer(config.learning_rate, beta1=config.beta1).minimize(model.loss, var_list=model.t_vars)
         nconv1_w = [var for var in model.t_vars if 'n_conv1/biases' in var.name]
         bn3_beta = [var for var in model.t_vars if 'bn3/beta' in var.name]
         nslice_bn2_beta=[var for var in model.t_vars if 'n_slice/bn2/beta' in var.name]
@@ -38,7 +38,7 @@ class Train(object):
             print(" [!] Load failed...")
 
         ids,datas,self.data=getidsAndimages(config.dataset_name)
-        self.hashtags=getHashtags(config.dataset_name)
+        self.hashtags=getHashtags(config.dataset_name).astype(np.int32)
 
         batch_idxs = min(len(ids), config.train_size) // config.batch_size
         for epoch in xrange(config.epoch):

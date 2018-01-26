@@ -73,7 +73,7 @@ class Model(object):
       inputs = self.inputs
       hashtags=self.hashtags
 
-      self.logits=self.network(inputs,32,name="logits")
+      self.logits=self.network(inputs,32)
 
       def sqrt_l2_loss_2(x,y):
           diff=tf.subtract(y,x)
@@ -87,7 +87,10 @@ class Model(object):
 
       with tf.variable_scope('Accuracy'):
           abslogits=tf.abs(self.logits,name="abslogits")
-          predictions = tf.cast(tf.greater(abslogits, 0.5),tf.float32,name="predictions")
+          predictions = tf.cast(tf.greater(abslogits, 0.5),tf.int32,name="predictions")
+          hashtags=tf.cast(hashtags,tf.int32)
+          print predictions
+          print hashtags
           correct_predictions = tf.equal(predictions, hashtags, name="correct_predictions")
           self.accuracy = tf.reduce_mean(tf.cast(correct_predictions, tf.float32))
 
@@ -104,7 +107,7 @@ class Model(object):
           pool2=avg_pool(conv2,name='n_pool2')
           conv3=tf.nn.relu(self.bn3(conv2d(pool2,self.f3_dim,name='n_conv3')),name='n_relu3')
           pool3=avg_pool(conv3,name='n_pool3')
-          fc=linear(tf.reshape(pool3, [self.batch_size, -1]), 4096,name='n_fc')
+          fc=linear(tf.reshape(pool3, [-1, 3*3*64]), 4096,name='n_fc')
           slices=sliceop(fc,self.slicenum,self.outbit,name='n_slice')
           return slices
 

@@ -2,7 +2,7 @@ import os
 import scipy.misc
 import numpy as np
 
-from model import Model
+from model2 import Model
 from train import Train
 from utils import pp, show_all_variables
 

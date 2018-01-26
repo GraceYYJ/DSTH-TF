@@ -46,7 +46,8 @@ def conv2d(input_, output_dim,
     conv = tf.nn.conv2d(input_, w, strides=[1, d_h, d_w, 1], padding='SAME')
     #biases = tf.get_variable('biases', [output_dim], initializer=tf.constant_initializer(0.0))
     biases = tf.get_variable('biases', [output_dim], initializer=tf.random_uniform_initializer())
-    conv = tf.reshape(tf.nn.bias_add(conv, biases), conv.get_shape())
+    conv = tf.reshape(tf.nn.bias_add(conv, biases), [-1, conv.get_shape()[1], conv.get_shape()[2], conv.get_shape()[3]])
+    #conv = tf.reshape(tf.nn.bias_add(conv, biases), conv.get_shape())
     return conv
 
 def lrelu(x, leak=0.2, name="lrelu"):
@@ -76,12 +77,13 @@ def sliceop(input,slicenum,outbit,name="slice"):
     batchsize=input.shape[0]
     slicesize=input.shape[1]/slicenum
     bn0 = batch_norm(name='bn0')
-    slices=bn0(linear(tf.slice(input,[0,0],[batchsize,slicesize]),outbit,name='linear0'))
+    #slices=bn0(linear(tf.slice(input,[0,0],[batchsize,slicesize]),outbit,name='linear0'))
+    slices = bn0(linear(tf.slice(input, [0, 0], [-1, slicesize]), outbit, name='linear0'))
     print slices
     for i in range(1,slicenum):
       newstart=tf.cast((slicesize*i),tf.int32)
       bnx=batch_norm(name='bn'+str(i))
-      slicex=bnx(linear(tf.slice(input,[0,newstart],[batchsize,slicesize]),outbit,name='linear'+str(i)))
+      slicex=bnx(linear(tf.slice(input,[0,newstart],[-1,slicesize]),outbit,name='linear'+str(i)))
       print slicex
       slices=tf.concat([slices,slicex],1)
     return slices
