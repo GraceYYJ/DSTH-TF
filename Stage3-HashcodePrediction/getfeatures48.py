@@ -34,7 +34,7 @@ def load_graph(frozen_graph_filename):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--frozen_model_filename", default="/tfproject/DSTH-TF/dsthmodel/checkpoint/cifar10_50_32_32/frozen_model.pb", type=str,
+    parser.add_argument("--frozen_model_filename", default="/tfproject/DSTH-TF/classifymodel/checkpoint/cifar10_50_32_32/classify_model.pb", type=str,
                         help="Frozen model file to import")
     args = parser.parse_args()
     graph = load_graph(args.frozen_model_filename)
@@ -43,60 +43,37 @@ if __name__ == '__main__':
     # op.values() gives you a list of tensors it produces
     # op.name gives you the name
 
-    # for op in graph.get_operations():
-    #     print(op.name, op.values())
+    for op in graph.get_operations():
+        print(op.name, op.values())
 
         # prefix/Placeholder/inputs_placeholder
         # ...
         # prefix/Accuracy/predictions
 
-    predicthashcode=[]
-    predicthashstr=[]
+    features=[]
     starttime = datetime.datetime.now()
     inputs=graph.get_tensor_by_name('images:0')
-    #hashtags=graph.get_tensor_by_name('hashbit:0')
-    predictions=graph.get_tensor_by_name('Accuracy/predictions:0')
+    #predictions=graph.get_tensor_by_name('Accuracy/predictions:0')
+    fc4=graph.get_tensor_by_name('network32/n_fc_4/add:0')
     ids, labels, images = utils.getidsAndimages('/tfproject/DSTH-TF/datasets/cifar10')
-    hashtags=utils.getHashtags('/tfproject/DSTH-TF/datasets/cifar10')
+    #hashtags=utils.getHashtags('/tfproject/DSTH-TF/datasets/cifar10')
     batch_idxs = len(ids) // batchsize
     with tf.Session(graph=graph) as sess:
         for idx in xrange(0, batch_idxs):
             batch1 = images[idx * batchsize:(idx + 1) * batchsize]
             batch_images = np.array(batch1).astype(np.float32)
-            hashcode = sess.run(predictions, feed_dict={inputs:batch_images})
-            print(hashcode)  # [[ 0.]] Yay!
-            predicthashcode.extend(hashcode)
-        predicthashcode=np.asarray(predicthashcode, dtype=np.int32)
-        print predicthashcode
-        print predicthashcode.shape
-        predicthashs = h5py.File(os.path.join(__PATH__, 'predicthasharray.hy'), 'w')
-        predicthashs.create_dataset("predicthasharray", data=predicthashcode)
-        predicthashs.create_dataset("originlabel", data=labels)
-        print len(predicthashcode)
-        for i in range(len(predicthashcode)):
-            strx="".join(str(j) for j in predicthashcode[i])
-            print predicthashcode[i]
-            print strx
-            predicthashstr.append(strx)
-        print predicthashstr
-        predicthashstr=np.asarray(predicthashstr)
-        predicthashstrf = h5py.File(os.path.join(__PATH__, 'predicthashstr.hy'), 'w')
-        predicthashstrf.create_dataset("predicthashstr", data=predicthashstr)
-        predicthashstrf.create_dataset("originlabel", data=labels)
+            features48 = sess.run(fc4, feed_dict={inputs:batch_images})
+            print(features48)  # [[ 0.]] Yay!
+            features.extend(features48)
+        features = np.asarray(features, dtype=np.float32)
+        print features
+        print features.shape
+        predictfeatures48 = h5py.File(os.path.join(__PATH__, 'features48.hy'), 'w')
+        predictfeatures48.create_dataset("features48", data=features)
+        predictfeatures48.create_dataset("originlabel", data=labels)
     print ("finish")
     endtime = datetime.datetime.now()
     usetime=(endtime-starttime).seconds
     print usetime,"seconds"
 
-    predicthashs.close()
-    predicthashstrf.close()
-    #test
-    # with tf.Session(graph=graph) as sess:
-    #     batch=images[20].reshape((1,32,32,3))
-    #     hashcode = sess.run(logits, feed_dict={inputs:batch})
-    #     print hashcode  # [[ 0.]] Yay!
-    # print hashtags[20]
-    # print ("finish")
-    # endtime = datetime.datetime.now()
-    # usetime=(endtime-starttime).seconds
-    # print usetime,"seconds"
+    predictfeatures48.close()

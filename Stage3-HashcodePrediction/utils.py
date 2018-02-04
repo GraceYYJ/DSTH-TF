@@ -62,24 +62,31 @@ def load_image3(img):
 
 def getidsAndimages(dataset_name):
     id_txt = os.path.join('../datasets',dataset_name,'id.txt')
+    print id_txt
     try:
         with open(id_txt, 'r') as fp:
             ids = [s.strip() for s in fp.readlines() if s]
     except:
         raise IOError('Dataset not found. Please make sure the dataset was downloaded.')
-    file = os.path.join('../datasets',dataset_name,'data.hy')
+    file = os.path.join('../datasets',dataset_name,'12pics.hy')
+    print file
     try:
         data = h5py.File(file, 'r')
     except:
         raise IOError('Dataset not found. Please make sure the dataset was downloaded.')
     images=[]
+    labels=[]
     for i in range(len(ids)):
         image = data[ids[i]]['image'].value / 255.
+        label = data[ids[i]]['label'].value
         images.append(image.astype(np.float32))
+        labels.append(label.astype(np.int32))
     images=np.asarray(images, dtype=np.float32)
+    labels=np.asarray(labels, dtype=np.int32)
     data.close()
     print("images",images.shape)
-    return ids,data,images
+    print("labels",labels.shape)
+    return ids,labels,images
 
 def getHashtags(dataset_name):
     f = h5py.File(os.path.join('../datasets',dataset_name, 'hashcode.hy'), 'r')

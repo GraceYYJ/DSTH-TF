@@ -9,7 +9,7 @@ from six.moves import xrange
 
 from ops import *
 from utils import *
-from model2 import *
+from dsthmodelv2 import *
 
 class Train(object):
     def __init__(self,sess):

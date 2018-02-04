@@ -7,7 +7,7 @@ import numpy as np
 import h5py
 import os.path
 
-__PATH__ = '../datasets/cifar10'
+__PATH__ = '../datasets/hdf5_tencent'
 batchsize=100
 
 def load_graph(frozen_graph_filename):
@@ -56,8 +56,8 @@ if __name__ == '__main__':
     inputs=graph.get_tensor_by_name('images:0')
     #hashtags=graph.get_tensor_by_name('hashbit:0')
     predictions=graph.get_tensor_by_name('Accuracy/predictions:0')
-    ids, labels, images = utils.getidsAndimages('/tfproject/DSTH-TF/datasets/cifar10')
-    hashtags=utils.getHashtags('/tfproject/DSTH-TF/datasets/cifar10')
+    ids, labels, images = utils.getidsAndimages('/tfproject/DSTH-TF/datasets/hdf5_tencent')
+    #hashtags=utils.getHashtags('/tfproject/DSTH-TF/datasets/cifar10')
     batch_idxs = len(ids) // batchsize
     with tf.Session(graph=graph) as sess:
         for idx in xrange(0, batch_idxs):

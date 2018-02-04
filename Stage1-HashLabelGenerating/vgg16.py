@@ -77,6 +77,8 @@ class Vgg16:
         self.fc7 = self.fc_layer(self.relu6, "fc7")
         self.relu7 = tf.nn.relu(self.fc7)
 
+        #self.fc_48=self.fc_layer(self.relu7,"fc_48")
+
         self.fc8 = self.fc_layer(self.relu7, "fc8")
 
         self.prob = tf.nn.softmax(self.fc8, name="prob")

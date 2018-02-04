@@ -13,9 +13,10 @@ def freeze_graph(model_folder):
     print input_checkpoint
     # We precise the file fullname of our freezed graph
     absolute_model_folder = "/".join(input_checkpoint.split('/')[:-1])
-    output_graph = absolute_model_folder + "/frozen_model.pb"
-
-    output_node_names = "Accuracy/predictions"
+    # output_graph = absolute_model_folder + "/frozen_model.pb"
+    output_graph = absolute_model_folder + "/classify_model.pb"
+    # output_node_names = "Accuracy/predictions"
+    output_node_names = "network32/n_fc_4/add"
 
     # We clear the devices, to allow TensorFlow to control on the loading where it wants operations to be calculated
     clear_devices = True
