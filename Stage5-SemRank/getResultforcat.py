@@ -1,6 +1,6 @@
 import time
-from hotpotServer16k import hotpots
-NUM=16000
+from hotpotServerforcat import hotpots
+NUM=3000
 class TestResult:
     def __init__(self, test):
         self.test = test

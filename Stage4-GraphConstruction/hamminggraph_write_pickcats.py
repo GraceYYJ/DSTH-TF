@@ -10,10 +10,10 @@ __PATH1__ = '../datasets/pickpics'
 __PATH2__ = '../pickpics16k'
 L=48
 
-div=8
+div=2
 
-num="16k"
-NUM=16000
+num="cat2100"
+NUM=3000
 def hammingDist(hashstr1, hashstr2):
     """Calculate the Hamming distance between two bit strings"""
     return sum(c1 != c2 for c1, c2 in zip(hashstr1, hashstr2))
@@ -24,10 +24,10 @@ def hammingdist(hasharray1,hasharray2):
 
 if __name__ == "__main__":
 # nodes
-    hashstrfile = h5py.File(os.path.join(__PATH1__, 'predicthashstr.hy'), 'r')
+    hashstrfile = h5py.File(os.path.join(__PATH1__, 'datacatnum100.hy'), 'r')
     hyfile_node = h5py.File(os.path.join(__PATH2__,'hashnode'+num+'.hy'), 'w')
-    hashcode=hashstrfile["predicthashstr"].value
-    label=hashstrfile["originlabel"].value
+    hashcode=hashstrfile["pickedhashcode"].value
+    label=hashstrfile["pickedlabel"].value
     hyfile_node.create_dataset("hashnodestr"+num,data=hashcode)
     hyfile_node.create_dataset("hashnodestr"+num+"labels",data=label)
     hyfile_node.close()
@@ -46,7 +46,7 @@ if __name__ == "__main__":
         sameclass = []
         for j in range(len(hashcode)):
             dist = hammingDist(hashcode[i], hashcode[j])
-            if (i!=j) and (dist <= L/div):
+            if (i!=j) and (dist < L/div):
                 print i,j
                 relations[i][j]=dist
                 issameclass = (label[i] == label[j])

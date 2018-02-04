@@ -5,7 +5,7 @@ num=100
 
 __PATH__ = '../datasets/cifar10'
 __PATH2__ = '../graphfile'
-__PATH3__='../SemRank/1w'
+__PATH3__='../SemRank/16k'
 __PATH4__ = '../pickpics16k'
 # print(["===================read hash.hy"])
 # f = h5py.File(os.path.join(__PATH__, 'hash.hy'), 'r')
@@ -97,21 +97,21 @@ __PATH4__ = '../pickpics16k'
 #     print(f[key].name)
 # f.close()
 
-print(["===================read hashnode16khy"])
-number="16k"
-hyfile_node = h5py.File(os.path.join(__PATH4__, 'hashnode' + number + '.hy'), 'r')
-# for key in hyfile_node.keys():
-#     print(hyfile_node[key].name)
-hashlabel=hyfile_node["hashnodestr" + number +"labels"]
-print hashlabel[9375],hashlabel[6923],hashlabel[6387],hashlabel[13307]
-hyfile_node.close()
+# print(["===================read hashnode16khy"])
+# number="16k"
+# hyfile_node = h5py.File(os.path.join(__PATH4__, 'hashnode' + number + '.hy'), 'r')
+# # for key in hyfile_node.keys():
+# #     print(hyfile_node[key].name)
+# hashlabel=hyfile_node["hashnodestr" + number +"labels"]
+# print hashlabel[9375],hashlabel[6923],hashlabel[6387],hashlabel[13307]
+# hyfile_node.close()
 
-# print(["===================read result.hy"])
-# Result1w_7_file = h5py.File(os.path.join(__PATH3__, 'Result1w_7.hy'), 'r')
-# sum=0
-# Result=Result1w_7_file["Result"].value
-# print Result,len(Result)
-# for i in range(len(Result)):
-#     sum=Result[i][0]+sum
-# print sum
-# Result1w_7_file.close()
+print(["===================read result.hy"])
+Result1w_7_file = h5py.File(os.path.join(__PATH3__, 'Result16k_11.hy'), 'r')
+sum=0
+Result=Result1w_7_file["Result"].value
+print Result,len(Result)
+for i in range(len(Result)):
+    sum=Result[i][0]+sum
+print sum
+Result1w_7_file.close()

@@ -1,11 +1,11 @@
 import time
 import os.path
-from hotpotServer16k import hotpots
+from hotpotServerforcat import hotpots
 
 __PATH2__ = '../pickpics16k'
-__PATH3__='../SemRank/16k'
+__PATH3__='../SemRank/cat/3000'
 L=48
-NUM=16000
+NUM=3000
 class TestMatrix:
     def __init__(self, test):
         self.test = test
