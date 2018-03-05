@@ -4,8 +4,9 @@ import h5py
 import numpy as np
 topnum1=150
 topnum2=600
+topnum3=3000
 num="cat2100"
-NUM=1000
+NUM=3000
 __PATH1__ = '../datasets/pickpics'
 __PATH2__ = '../pickpics16k'
 __PATH4__='../SemRank/cat/3000'
@@ -54,8 +55,8 @@ print count1
 f1.write(str(count1) + "\n"+str(mean) + "\n")
 f1.close()
 
-Result2=Result[0:topnum2]
-f2 = file(os.path.join(__PATH4__, 'TOP'+str(topnum2)+'.txt'), "a+")
+Result2=Result[0:topnum3]
+f2 = file(os.path.join(__PATH4__, 'TOP'+str(topnum3)+'.txt'), "a+")
 for i in range(len(Result2)):
     print Result[i],label[Result[i]][3]
     if label[Result[i]][3]==1:
@@ -63,7 +64,7 @@ for i in range(len(Result2)):
         count2=count2+1
     f2.write(str(i)+": "+str(Result[i]) + "--"+str(label[Result[i]][3])+"\n")
 print count2
-mean = count2 / topnum2
+mean = count2 / topnum3
 print mean
 f2.write(str(count2) + "\n"+str(mean) + "\n")
 f2.close()
