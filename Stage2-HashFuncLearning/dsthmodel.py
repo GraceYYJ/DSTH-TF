@@ -68,25 +68,28 @@ class Model(object):
       # self.hashtags = tf.placeholder(tf.float32, [self.batch_size, self.hashbit], name='hashbit')
 
       self.inputs = tf.placeholder(tf.float32, name='images',shape = [None]+image_dims)
-      self.labels = tf.placeholder(tf.int32,name='labels',shape=[None,10])
+      self.hashtags = tf.placeholder(tf.float32,name='hashbit',shape=[None, self.hashbit])
 
       inputs = self.inputs
-      labels=self.labels
+      hashtags=self.hashtags
 
-      self.fc4,self.fc6,self.prob=self.network(inputs,32)
+      self.logits=self.network(inputs,32)
 
-      with tf.variable_scope('variables'):
-          self.features48=tf.cast(self.fc4,tf.float32,name='features48')
+      def sqrt_l2_loss_2(x,y):
+          diff=tf.subtract(y,x)
+          loss=tf.sqrt(tf.reduce_sum(tf.square(diff),1))
+          return loss
 
       with tf.variable_scope('Loss'):
-          self.loss=tf.reduce_sum(tf.nn.softmax_cross_entropy_with_logits(labels=labels,logits=self.fc6))
+          self.loss=tf.reduce_mean(sqrt_l2_loss_2(self.logits,hashtags))
 
       self.loss_sum = scalar_summary("loss", self.loss)
 
       with tf.variable_scope('Accuracy'):
-          predictions=tf.argmax(self.prob, 1,name="predictions")
-          tags=tf.argmax(labels, 1)
-          correct_predictions = tf.equal(predictions, tags, name="correct_predictions")
+          abslogits=tf.abs(self.logits,name="abslogits")
+          predictions = tf.cast(tf.greater(abslogits, 0.5),tf.int32,name="predictions")
+          hashtags=tf.cast(hashtags,tf.int32)
+          correct_predictions = tf.equal(predictions, hashtags, name="correct_predictions")
           self.accuracy = tf.reduce_mean(tf.cast(correct_predictions, tf.float32))
 
       self.t_vars = tf.trainable_variables()
@@ -102,13 +105,9 @@ class Model(object):
           pool2=avg_pool(conv2,name='n_pool2')
           conv3=tf.nn.relu(self.bn3(conv2d(pool2,self.f3_dim,name='n_conv3')),name='n_relu3')
           pool3=avg_pool(conv3,name='n_pool3')
-          fc4=linear(tf.reshape(pool3, [-1, 3*3*64]), 48,name='n_fc_4')
-          fc6 = linear(fc4, 10, name='n_fc_6')
-          #fc5=linear(fc4, 48,name='n_fc_5')
-          #fc6=linear(fc5, 10,name='n_fc_6')
-          prob=tf.nn.softmax(fc6, name="prob")
-          #return fc5,fc6,prob
-          return fc4,fc6,prob
+          fc=linear(tf.reshape(pool3, [-1, 3*3*64]), 4096,name='n_fc')
+          slices=sliceop(fc,self.slicenum,self.outbit,name='n_slice')
+          return slices
 
   @property
   def model_dir(self):
@@ -117,7 +116,7 @@ class Model(object):
           self.output_height, self.output_width)
 
   def save(self, train, checkpoint_dir, step):
-      model_name = "Classify.model"
+      model_name = "DSTH.model"
       checkpoint_dir = os.path.join(checkpoint_dir, self.model_dir)
 
       if not os.path.exists(checkpoint_dir):

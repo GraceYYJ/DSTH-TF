@@ -2,7 +2,7 @@ import os
 import scipy.misc
 import numpy as np
 
-from dsthmodelv2 import Model
+from dsthmodel import Model
 from dsthtrain import Train
 from utils import pp, show_all_variables
 
